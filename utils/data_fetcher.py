@@ -3,14 +3,14 @@ import pandas as pd
 import numpy as np
 
 def fetch_price(symbol):
-    """ดึงราคาปัจจุบัน"""
+    """ดึงราคาปัจจุบันของหุ้นไทย (เติม .BK)"""
     try:
-        ticker = yf.Ticker(symbol + ".BK")  # สำหรับหุ้นไทย
+        ticker = yf.Ticker(symbol + ".BK")
         data = ticker.history(period="1d")
         if not data.empty:
             return round(data['Close'].iloc[-1], 2)
-    except:
-        pass
+    except Exception as e:
+        print(f"Error fetching {symbol}: {e}")
     return None
 
 def fetch_rsi(symbol, period=14):
