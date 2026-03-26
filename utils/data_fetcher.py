@@ -3,27 +3,6 @@ import pandas as pd
 import numpy as np
 import time
 import random
-from requests import Session
-from requests_cache import CacheMixin, SQLiteCache
-from requests_ratelimiter import LimiterMixin, MemoryQueueBucket
-from pyrate_limiter import Duration, RequestRate, Limiter
-
-# สร้าง Session ที่ทนทานต่อการโดนบล็อค
-class CachedLimiterSession(CacheMixin, LimiterMixin, Session):
-    pass
-
-# ตั้งค่า Session
-session = CachedLimiterSession(
-    limiter=Limiter(RequestRate(2, Duration.SECOND)),  # จำกัด 2 request/วินาที
-    bucket_class=MemoryQueueBucket,
-    cache_name="yfinance_cache",
-    backend=SQLiteCache()
-)
-
-# เปลี่ยน User-Agent เป็นอันที่ Yahoo เชื่อถือ
-session.headers.update({
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-})
 
 # Mock data เผื่อกรณีดึงไม่ได้
 MOCK_PRICES = {
@@ -53,7 +32,7 @@ def fetch_price(symbol):
     """ดึงราคาปัจจุบัน"""
     try:
         ticker = yf.Ticker(symbol + ".BK")
-        data = ticker.history(period="1d", session=session)
+        data = ticker.history(period="1d")
         if not data.empty:
             return round(data['Close'].iloc[-1], 2)
         else:
@@ -68,7 +47,7 @@ def fetch_rsi(symbol, period=14):
     """ดึงค่า RSI"""
     try:
         ticker = yf.Ticker(symbol + ".BK")
-        data = ticker.history(period="1mo", session=session)
+        data = ticker.history(period="1mo")
         if len(data) < period:
             return None
         close = data['Close']
@@ -90,7 +69,7 @@ def fetch_ema200(symbol):
     """ดึง EMA200"""
     try:
         ticker = yf.Ticker(symbol + ".BK")
-        data = ticker.history(period="1y", session=session)
+        data = ticker.history(period="1y")
         if len(data) < 200:
             return None
         ema = data['Close'].ewm(span=200, adjust=False).mean()
