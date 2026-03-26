@@ -9,3 +9,5 @@ yfinance==0.2.51
 setuptools==75.8.0
 wheel==0.45.1
 requests-cache==1.2.0
+requests-ratelimiter==0.6.0
+pyrate-limiter==3.1.1
