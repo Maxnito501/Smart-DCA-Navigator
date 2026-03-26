@@ -3,20 +3,6 @@ import pandas as pd
 import numpy as np
 import time
 import random
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
-
-# ตั้งค่า Session เพื่อเลี่ยง Rate Limit
-session = yf.shared.session
-session.headers.update({
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-})
-
-# ตั้งค่า Retry
-retry = Retry(total=3, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
-adapter = HTTPAdapter(max_retries=retry)
-session.mount('http://', adapter)
-session.mount('https://', adapter)
 
 # Mock data เผื่อกรณีดึงไม่ได้
 MOCK_PRICES = {
@@ -50,7 +36,6 @@ def fetch_price(symbol):
         if not data.empty:
             return round(data['Close'].iloc[-1], 2)
         else:
-            # ใช้ mock data ถ้าดึงไม่ได้
             return MOCK_PRICES.get(symbol, 50.00)
     except Exception as e:
         print(f"Error fetching {symbol}: {e}")
